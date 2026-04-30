@@ -1,0 +1,29 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model SensorData {
+  id           Int      @id @default(autoincrement())
+  timestamp    DateTime @default(now())
+  temperature  Float
+  soilMoisture Float
+  pumpState    String   @default("off")
+}
+
+model PumpStatus {
+  id          Int      @id @default(autoincrement())
+  isOn        Boolean  @default(false)
+  lastUpdated DateTime @default(now())
+}
+
+model SystemConfig {
+  id                Int      @id @default(autoincrement())
+  tempThreshold     Float    @default(18.0)
+  moistureThreshold Float    @default(30.0)
+  pumpMode          String   @default("auto")
+}
