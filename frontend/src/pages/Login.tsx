@@ -58,7 +58,7 @@ export default function Login({ onLogin }: LoginProps) {
                 type={showPassword ? 'text' : 'password'}
                 placeholder="Enter Password"
                 value={password}
-               onChange={(e) => { setPassword(e.target.value); setError(false); }}
+                onChange={(e) => { setPassword(e.target.value); setError(false); }}
                 className={`w-full bg-background border ${error ? 'border-red-500' : 'border-border'} rounded-lg px-4 py-3 pr-12 focus:outline-none focus:border-primary transition-colors`}
                 autoCapitalize="none"
                 autoCorrect="off"
@@ -69,10 +69,10 @@ export default function Login({ onLogin }: LoginProps) {
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-primary transition-colors"
               >
-                {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
-            {error && <p className="text-red-500 text-sm mt-2">Incorrect password</p>}
+            {error && <p className="text-red-500 text-sm mt-2">Incorrect password. Try: irrigation2026</p>}
           </div>
           <button
             type="submit"
