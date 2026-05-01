@@ -72,7 +72,7 @@ export default function Login({ onLogin }: LoginProps) {
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
-            {error && <p className="text-red-500 text-sm mt-2">Incorrect password. Try: irrigation2026</p>}
+            {error && <p className="text-red-500 text-sm mt-2">Incorrect password, please try again!</p>}
           </div>
           <button
             type="submit"
@@ -86,3 +86,4 @@ export default function Login({ onLogin }: LoginProps) {
     </div>
   );
 }
+
