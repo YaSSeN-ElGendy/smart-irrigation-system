@@ -58,7 +58,7 @@ export default function Login({ onLogin }: LoginProps) {
                 type={showPassword ? 'text' : 'password'}
                 placeholder="Enter Password"
                 value={password}
-                onChange={(e) => { setPassword(e.target.value) setError(false); }}
+               onChange={(e) => { setPassword(e.target.value); setError(false); }}
                 className={`w-full bg-background border ${error ? 'border-red-500' : 'border-border'} rounded-lg px-4 py-3 pr-12 focus:outline-none focus:border-primary transition-colors`}
                 autoCapitalize="none"
                 autoCorrect="off"
