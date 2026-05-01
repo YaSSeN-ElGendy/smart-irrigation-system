@@ -69,10 +69,10 @@ export default function Login({ onLogin }: LoginProps) {
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-primary transition-colors"
               >
-                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
               </button>
             </div>
-            {error && <p className="text-red-500 text-sm mt-2">Incorrect password. Try: irrigation2026</p>}
+            {error && <p className="text-red-500 text-sm mt-2">Incorrect password</p>}
           </div>
           <button
             type="submit"
