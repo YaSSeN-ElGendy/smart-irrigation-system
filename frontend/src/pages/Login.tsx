@@ -6,7 +6,7 @@ interface LoginProps {
   onLogin: () => void;
 }
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const API_URL = (import.meta as any).env.VITE_API_URL || 'http://localhost:3001';
 
 export default function Login({ onLogin }: LoginProps) {
   const [password, setPassword] = useState('');
@@ -15,17 +15,20 @@ export default function Login({ onLogin }: LoginProps) {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(event.target.value);
+    setError(false);
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
     try {
-      const response = await fetch(`${API_URL}/api/login`, {
+      const response = await fetch(API_URL + '/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password })
       });
-
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem('auth_token', data.token);
@@ -35,7 +38,6 @@ export default function Login({ onLogin }: LoginProps) {
         setError(true);
       }
     } catch (err) {
-      console.error("Login request failed", err);
       setError(true);
     } finally {
       setLoading(false);
@@ -50,7 +52,6 @@ export default function Login({ onLogin }: LoginProps) {
           <h1 className="text-2xl font-bold tracking-tight">Smart Irrigation</h1>
           <p className="text-muted mt-2">Enter credentials to access dashboard</p>
         </div>
-
         <form onSubmit={handleLogin} className="space-y-6">
           <div>
             <div className="relative">
@@ -58,7 +59,7 @@ export default function Login({ onLogin }: LoginProps) {
                 type={showPassword ? 'text' : 'password'}
                 placeholder="Enter Password"
                 value={password}
-                onChange={(e) => { setPassword(e.target.value); setError(false); }}
+                onChange={handleChange}
                 className={`w-full bg-background border ${error ? 'border-red-500' : 'border-border'} rounded-lg px-4 py-3 pr-12 focus:outline-none focus:border-primary transition-colors`}
                 autoCapitalize="none"
                 autoCorrect="off"
@@ -72,7 +73,7 @@ export default function Login({ onLogin }: LoginProps) {
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
-            {error && <p className="text-red-500 text-sm mt-2">Incorrect password, please try again!</p>}
+            {error && <p className="text-red-500 text-sm mt-2">Incorrect password.</p>}
           </div>
           <button
             type="submit"
@@ -86,4 +87,3 @@ export default function Login({ onLogin }: LoginProps) {
     </div>
   );
 }
-
