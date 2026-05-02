@@ -1,35 +1,41 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useAuth } from './contexts/AuthContext';
-import MainLayout from './layout/MainLayout';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
-import About from './pages/About';
-
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { token } = useAuth();
-  if (!token) {
-    return <Navigate to="/login" replace />;
-  }
-  return <>{children}</>;
-}
+import { useState } from 'react';
 
 export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    !!localStorage.getItem('auth_token')
+  );
+
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+  };
+
   return (
     <Router>
       <Routes>
-        <Route path="/login" element={<Login />} />
+        <Route
+          path="/login"
+          element={
+            isAuthenticated
+              ? <Navigate to="/" replace />
+              : <Login onLogin={handleLogin} />
+          }
+        />
         <Route
           path="/"
           element={
-            <ProtectedRoute>
-              <MainLayout />
-            </ProtectedRoute>
+            isAuthenticated
+              ? <Dashboard onLogout={handleLogout} />
+              : <Navigate to="/login" replace />
           }
-        >
-          <Route index element={<Dashboard />} />
-          <Route path="about" element={<About />} />
-        </Route>
+        />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );
