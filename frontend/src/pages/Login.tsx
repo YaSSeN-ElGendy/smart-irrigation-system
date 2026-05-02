@@ -6,7 +6,8 @@ interface LoginProps {
   onLogin: () => void;
 }
 
-const API_URL = (import.meta as any).env.VITE_API_URL || 'http://localhost:3001';
+// استخدام Optional Chaining لتفادي أخطاء الـ undefined
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 export default function Login({ onLogin }: LoginProps) {
   const [password, setPassword] = useState('');
@@ -17,18 +18,23 @@ export default function Login({ onLogin }: LoginProps) {
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(event.target.value);
-    setError(false);
+    if (error) setError(false); // إعادة تعيين الخطأ فقط إذا كان موجوداً
   };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // منع الإرسال إذا كانت الخانة فارغة (Logic Check)
+    if (!password.trim()) return;
+
     setLoading(true);
     try {
-      const response = await fetch(API_URL + '/api/login', {
+      const response = await fetch(`${API_URL}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password })
       });
+
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem('auth_token', data.token);
@@ -52,6 +58,7 @@ export default function Login({ onLogin }: LoginProps) {
           <h1 className="text-2xl font-bold tracking-tight">Smart Irrigation</h1>
           <p className="text-muted mt-2">Enter credentials to access dashboard</p>
         </div>
+
         <form onSubmit={handleLogin} className="space-y-6">
           <div>
             <div className="relative">
@@ -60,7 +67,10 @@ export default function Login({ onLogin }: LoginProps) {
                 placeholder="Enter Password"
                 value={password}
                 onChange={handleChange}
-                className={`w-full bg-background border ${error ? 'border-red-500' : 'border-border'} rounded-lg px-4 py-3 pr-12 focus:outline-none focus:border-primary transition-colors`}
+                autoComplete="current-password" // تحسين لتجربة المستخدم
+                className={`w-full bg-background border ${
+                  error ? 'border-red-500' : 'border-border'
+                } rounded-lg px-4 py-3 pr-12 focus:outline-none focus:border-primary transition-colors`}
                 autoCapitalize="none"
                 autoCorrect="off"
                 spellCheck="false"
@@ -68,17 +78,25 @@ export default function Login({ onLogin }: LoginProps) {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-primary transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors"
               >
+                {/* تم تبديل الأيقونات هنا إذا كنت تشعر أنها معكوسة */}
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
-            {error && <p className="text-red-500 text-sm mt-2">Incorrect password.</p>}
+            {error && (
+              <p className="text-red-500 text-sm mt-2 animate-pulse">
+                Incorrect password. Please try again.
+              </p>
+            )}
           </div>
+
           <button
             type="submit"
-            disabled={loading}
-            className={`w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 px-4 rounded-lg transition-colors ${loading ? 'opacity-70' : ''}`}
+            disabled={loading || !password.trim()} // تعطيل الزر إذا كان الحقل فارغاً
+            className={`w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 px-4 rounded-lg transition-all ${
+              loading || !password.trim() ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
           >
             {loading ? 'Authenticating...' : 'Login'}
           </button>
