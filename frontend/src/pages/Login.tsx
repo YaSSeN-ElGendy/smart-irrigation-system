@@ -81,7 +81,7 @@ export default function Login({ onLogin }: LoginProps) {
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors"
               >
                 {/* تم تبديل الأيقونات هنا إذا كنت تشعر أنها معكوسة */}
-                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
               </button>
             </div>
             {error && (
