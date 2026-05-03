@@ -37,15 +37,44 @@ const authenticate = (req: express.Request, res: express.Response, next: express
 
 // --- Initialization ---
 async function initializeDB() {
-  const pumpCount = await prisma.pumpStatus.count();
-  if (pumpCount === 0) {
-    await prisma.pumpStatus.create({ data: { isOn: false } });
-  }
-  const configCount = await prisma.systemConfig.count();
-  if (configCount === 0) {
-    await prisma.systemConfig.create({ 
-      data: { tempThreshold: 18.0, moistureThreshold: 30.0, pumpMode: 'auto' } 
-    });
+  try {
+    await prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS "SensorData" (
+        "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        "temperature" REAL NOT NULL,
+        "soilMoisture" REAL NOT NULL,
+        "pumpState" TEXT NOT NULL DEFAULT 'off',
+        "timestamp" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    await prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS "PumpStatus" (
+        "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        "isOn" BOOLEAN NOT NULL DEFAULT false,
+        "lastUpdated" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    await prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS "SystemConfig" (
+        "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        "tempThreshold" REAL NOT NULL DEFAULT 18.0,
+        "moistureThreshold" REAL NOT NULL DEFAULT 30.0,
+        "pumpMode" TEXT NOT NULL DEFAULT 'auto'
+      )
+    `);
+
+    const pumpCount = await prisma.pumpStatus.count();
+    if (pumpCount === 0) {
+      await prisma.pumpStatus.create({ data: { isOn: false } });
+    }
+    const configCount = await prisma.systemConfig.count();
+    if (configCount === 0) {
+      await prisma.systemConfig.create({
+        data: { tempThreshold: 18.0, moistureThreshold: 30.0, pumpMode: 'auto' }
+      });
+    }
+  } catch (e) {
+    console.error('DB Init Error:', e);
   }
 }
 initializeDB().catch(console.error);
